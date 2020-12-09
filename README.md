@@ -9,6 +9,7 @@ There are a number of reasons why it might be helpful for every Salesforce user 
 
 Prerequisites:
 
+* 'Update Records with Inactive Owners' user permission enabled
 * custom picklist field called Status (Status__c) on the contact object, with values of 'Active' and 'Inactive'
 * custom metadata type of Employee Contact Setting (Employee_Contact_Setting__mdt), with custom field of ID (ID__c) and record called Company Account (Company_Account)
 
