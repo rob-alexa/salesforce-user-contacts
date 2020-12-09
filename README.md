@@ -4,6 +4,7 @@
 There are a number of reasons why it might be helpful for every Salesforce user to have a related contact record that is updated whenever certain user fields are updated. A couple of those reasons might be:
 
 * using cases for internal support (to benefit from case contact functionality)
+* mail merges, since Mass Email Users can't include recipient field values
 * making the built-in contact hierarchy org chart work for your company
 
 Prerequisites:
