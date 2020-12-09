@@ -36,8 +36,7 @@ public with sharing class UpsertUserContact {
              FROM Contact
              WHERE OwnerId IN: userIds
              AND AccountId =: companyAcctIds[0].ID__c
-             ORDER BY LastModifiedDate DESC
-             LIMIT 1];
+             ORDER BY LastModifiedDate DESC];
         
         Map <Id,Id> userContactMap = new Map <Id,Id>(); // Create a user contact map of userId, contactId
         
