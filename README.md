@@ -13,7 +13,7 @@ Prerequisites:
 * custom picklist field called Status (Status__c) on the contact object, with values of 'Active' and 'Inactive'
 * custom metadata type of Employee Contact Setting (Employee_Contact_Setting__mdt), with custom field of ID (ID__c) and record called Company Account (Company_Account)
 
-
+<br>
 <a href="https://githubsfdeploy.herokuapp.com">
   <img alt="Deploy to Salesforce"
        src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
