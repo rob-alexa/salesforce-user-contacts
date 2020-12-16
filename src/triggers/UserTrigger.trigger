@@ -7,7 +7,7 @@ trigger UserTrigger on User (after delete, after insert, after undelete, after u
         Set<Id> userIds = new Set<Id>();
         
         for (User u : trigger.new) {
-            if (u.ContactId == null) {
+            if (u.UserType == 'Standard') {
                 // Add the user id to the set of ids
                 userIds.add(u.Id);
             }
