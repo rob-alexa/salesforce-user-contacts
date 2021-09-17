@@ -12,7 +12,7 @@ trigger UserTrigger on User (after delete, after insert, after undelete, after u
                 userIds.add(u.Id);
             }
         }
-        if (!System.isFuture() && !System.isBatch()) {
+        if (!userIds.isEmpty() && !System.isFuture() && !System.isBatch()) {
             //upsert contact records with the changes in user records
             UpsertUserContact.execute(userIds);
         }
