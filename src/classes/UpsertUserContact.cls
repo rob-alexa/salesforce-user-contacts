@@ -10,38 +10,48 @@ public with sharing class UpsertUserContact {
                                                                LIMIT 1];
         
         List<User> users =
-            [SELECT Id, Email, FirstName, LastName, Department, ManagerId, Fax, IsActive, Phone, MobilePhone, Title, Street, City, State, PostalCode, Country
-             FROM User
-             WHERE Id IN : userIds];
+            [SELECT Id,Email,Extension,FirstName,LastName,Department,ManagerId,Manager.LastName, 
+             Fax, IsActive, Phone, MobilePhone, Title, Street, City, State, PostalCode, Country
+             FROM User WHERE Id IN : userIds];
         
-        List<Id> userManagerIds = new List<Id>();
+        Map <Id,Id> managerContactMap = new Map<Id,Id>();      // manager userId, manager contactId
+        Map<ID,String> userManagersMap = new Map<ID,String>(); // manager Id, manager LastName
         
         for(User managedUser: users){
             if (managedUser.ManagerId != null){
-                userManagerIds.add(managedUser.ManagerId);
+                userManagersMap.put(managedUser.ManagerId, managedUser.Manager.LastName);
             }
         }
         
-        List<Contact> managerContacts = [SELECT Id,OwnerId from Contact
-                                         WHERE OwnerId IN : userManagerIds];
-        
-        Map <Id,Id> managerContactMap = new Map<Id,Id>();   // Create a manager contact map of userId, contactId
-        
-        for(Contact managerContact: managerContacts){
-            managerContactMap.put(managerContact.OwnerId,managerContact.Id);
+        if (!userManagersMap.isEmpty()) {
+            List<Contact> managerContacts = [SELECT Id, LastName, OwnerId, Owner.LastName from Contact
+                                             WHERE OwnerId =: users[0].ManagerId
+                                             OR LastName =: userManagersMap.get(users[0].ManagerId)];
+            
+            for(Contact managerContact: managerContacts){
+                if (managerContact.LastName == managerContact.Owner.LastName) {
+                    managerContactMap.put(managerContact.OwnerId,managerContact.Id);
+                }
+            }
         }
         
         List<Contact> contacts =
-            [SELECT Id, OwnerId
+            [SELECT Id, LastName, OwnerId, Owner.LastName
              FROM Contact
-             WHERE OwnerId IN: userIds
+             WHERE (OwnerId IN: userIds
+                    OR LastName =: users[0].LastName)
              AND AccountId =: companyAcctIds[0].ID__c
              ORDER BY LastModifiedDate DESC];
         
         Map <Id,Id> userContactMap = new Map <Id,Id>(); // Create a user contact map of userId, contactId
         
         for(Contact userContact: contacts){
-            userContactMap.put(userContact.OwnerId,userContact.Id);
+            if (userContact.LastName == userContact.Owner.LastName) {
+                userContactMap.put(userContact.OwnerId,userContact.Id);
+            }
+            else {
+                userContactMap.put(users[0].Id,userContact.Id);
+            }
         }
         
         for (User u : users){                               // Loop through each upserted user
@@ -52,6 +62,7 @@ public with sharing class UpsertUserContact {
                 LastName = u.LastName,                      // Populate the last name
                 Department = u.Department,                  // Populate the user department
                 Fax = u.Fax,                                // Populate the fax number
+                Extension__c = u.Extension,          // Populate the phone extension
                 Phone = u.Phone,                            // Populate the phone number
                 MobilePhone = u.MobilePhone,                // Populate the mobile phone number
                 Title = u.Title,                            // Populate the title of user
@@ -63,7 +74,11 @@ public with sharing class UpsertUserContact {
                 OwnerId = u.Id);                            // Populate the contact owner
             if (u.IsActive == true) {
                 c.Status__c = 'Active';
-            } else {c.Status__c = 'Inactive';}
+                c.No_Longer_There__c = false;
+            } else {
+                c.Status__c = 'Inactive';
+                c.No_Longer_There__c = true;
+            }
             if (!companyAcctIds.isEmpty()) {
                 c.AccountId = companyAcctIds[0].ID__c;      // Populate the account lookup
             }
