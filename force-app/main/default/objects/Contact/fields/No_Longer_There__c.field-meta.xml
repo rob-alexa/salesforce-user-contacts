@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>No_Longer_There__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Checked when the related Salesforce user is inactive. Carries the same meaning as Status, as a checkbox for report and list view filters.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Set automatically from the related user record. Checked means the user is inactive.</inlineHelpText>
+    <label>No Longer There</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

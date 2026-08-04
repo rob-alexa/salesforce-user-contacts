@@ -1,0 +1,16 @@
+{
+    "plugins": ["prettier-plugin-apex"],
+    "trailingComma": "none",
+    "tabWidth": 4,
+    "printWidth": 120,
+    "overrides": [
+        {
+            "files": "*.{cls,trigger,apex}",
+            "options": { "apexInsertFinalNewline": true }
+        },
+        {
+            "files": "*.{json,yml,yaml}",
+            "options": { "tabWidth": 2 }
+        }
+    ]
+}

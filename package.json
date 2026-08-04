@@ -1,0 +1,15 @@
+{
+  "name": "salesforce-user-contacts",
+  "private": true,
+  "version": "2.0.0",
+  "description": "An employee contact record for every Salesforce user",
+  "scripts": {
+    "prettier": "prettier --write \"**/*.{cls,trigger,json,md,yml,yaml}\"",
+    "prettier:verify": "prettier --check \"**/*.{cls,trigger,json,md,yml,yaml}\"",
+    "scan": "sf code-analyzer run --rule-selector Recommended --workspace force-app --view table"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "prettier-plugin-apex": "^2.2.4"
+  }
+}

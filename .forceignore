@@ -1,0 +1,8 @@
+# Metadata the CLI writes back on retrieve but that does not belong in source.
+**/jsconfig.json
+**/.eslintrc.json
+
+**/profiles/**
+**/settings/**
+
+package.xml

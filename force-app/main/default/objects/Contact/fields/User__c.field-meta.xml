@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>User__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>The Salesforce user this employee contact mirrors. This is the key the sync matches on, so one user resolves to one contact without guessing from names.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>The Salesforce user this contact represents. Set automatically by the employee contact sync.</inlineHelpText>
+    <label>User</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Employee Contacts</relationshipLabel>
+    <relationshipName>Employee_Contacts</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>
