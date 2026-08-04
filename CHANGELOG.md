@@ -2,7 +2,7 @@
 
 ## 2.0.0
 
-Modernization of the 2020 release. Same purpose, same field contract on the contact, rebuilt underneath.
+Same purpose, same field contract on the contact, rebuilt underneath.
 
 ### Fixed
 
@@ -12,7 +12,7 @@ Modernization of the 2020 release. Same purpose, same field contract on the cont
 
 ### Changed
 
-- Matching is on a new `Contact.User__c` lookup rather than owner plus last name. Contacts that predate the field are still matched by owner and stamped with the lookup, so an existing org converges after one sync per user. See the upgrade notes in the README.
+- Matching is on a new `Contact.User__c` lookup rather than owner plus last name. A contact without that lookup set is still matched by owner and stamped with it, so an existing org converges after one sync per user. See the deployment notes in the README.
 - `@future` replaced by a `Queueable`. Same reason for going asynchronous (`User` is a setup object), but the job is now traceable in Apex Jobs, carries its configuration rather than re-reading statics, and can be chained.
 - A save that changes none of the mirrored user fields no longer queues a job. A last login, a permission set assignment, or a password reset used to queue one.
 - The trigger declares only `after insert, after update`. It previously declared all seven contexts and did nothing in five of them.
@@ -34,7 +34,3 @@ Modernization of the 2020 release. Same purpose, same field contract on the cont
 - Converted from the metadata API `src/` layout to SFDX source format with an `sfdx-project.json`.
 - API version 50.0 (Winter '21) to 67.0 (Summer '26).
 - Prettier with the Apex plugin, and a Code Analyzer run that fails on anything at Moderate or worse.
-
-## 1.0.0
-
-Initial release, December 2020.

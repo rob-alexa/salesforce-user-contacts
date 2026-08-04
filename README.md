@@ -14,7 +14,7 @@ A trigger on the after insert and after update contexts of `User` hands off to `
 
 `User` is a setup object and `Contact` is not, so the contact write has to happen asynchronously or Salesforce rejects the whole user save with `MIXED_DML_OPERATION`. The asynchronous hop also means a contact problem can never stop someone from saving a user record.
 
-Contacts are matched on the `Contact.User` lookup. A contact that predates that field is matched on its owner instead and stamped with the lookup as it goes past, so an existing org moves onto the exact key after one sync per user.
+Contacts are matched on the `Contact.User` lookup. A contact that does not have it set is matched on its owner instead and stamped with the lookup as it goes past, so an existing org moves onto the exact key after one sync per user.
 
 ## What is deployed
 
@@ -50,19 +50,17 @@ The user who owns the sync also needs the **Update Records with Inactive Owners*
   <img alt="Deploy to Salesforce" src="https://raw.githubusercontent.com/afawcett/githubsfdeploy/master/deploy.png">
 </a>
 
-## Upgrading from the 2020 version
+## Deploying into an org that already has employee contacts
 
-The old version matched contacts by owner and by last name, and read the first record of the batch when it did it, so a save touching more than one user matched every one of them against the first user's name and manager. Two things to know before deploying over it:
+Matching is on `Contact.User__c`, so a contact that does not have it set needs a look before the first sync.
 
-- **Backfill `Contact.User__c` first if you can.** Anything the old version matched by last name alone, where the contact was not owned by its user, is invisible to the new matching and would get a second contact. This finds them:
+A contact **owned by the user it represents** needs nothing: the sync finds it by owner and stamps the lookup as it goes. A contact **owned by anyone else** cannot be matched, and the sync would create a second one next to it. Find those first and set the lookup by hand or by load:
 
-    ```sql
-    SELECT Id, Name, OwnerId FROM Contact WHERE AccountId = '<your company account Id>' AND User__c = null
-    ```
+```sql
+SELECT Id, Name, OwnerId FROM Contact WHERE AccountId = '<your company account Id>' AND User__c = null
+```
 
-- **`UpsertUserContact.execute(Set<Id>)` is now `UpsertUserContact.enqueue(Set<Id>)`.** Nothing outside this repo called it, but a custom caller would need the rename.
-
-To resync everyone after the backfill, from anonymous Apex:
+To resync everyone afterwards, from anonymous Apex:
 
 ```apex
 Set<Id> userIds = new Map<Id, User>([SELECT Id FROM User WHERE UserType = 'Standard' AND IsActive = true]).keySet();

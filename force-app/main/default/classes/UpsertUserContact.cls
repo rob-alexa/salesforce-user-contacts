@@ -2,8 +2,8 @@
  * Mirrors a set of Salesforce users onto employee Contact records under a single
  * company account.
  *
- * Matching is by the Contact.User lookup. Contacts created before that field existed
- * are picked up by owner instead and stamped with the lookup on the way past, so an
+ * Matching is by the Contact.User lookup. A contact that does not have it set yet is
+ * picked up by owner instead and stamped with the lookup on the way past, so an
  * existing org converges on the exact key after one sync per user.
  */
 public with sharing class UpsertUserContact implements Queueable {
@@ -173,8 +173,8 @@ public with sharing class UpsertUserContact implements Queueable {
             ORDER BY LastModifiedDate ASC
         ];
 
-        // Owner is the adoption path for contacts that predate the User lookup, so it
-        // is filled in first and an explicit User match always overwrites it.
+        // Owner is the adoption path for a contact with no User lookup set, so it is
+        // filled in first and an explicit User match always overwrites it.
         Map<Id, Contact> byUserId = new Map<Id, Contact>();
         for (Contact match : matches) {
             if (match.User__c == null && lookupIds.contains(match.OwnerId)) {
