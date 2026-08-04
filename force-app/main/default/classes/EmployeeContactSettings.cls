@@ -2,8 +2,7 @@
  * Resolves the custom metadata that drives the employee contact sync.
  *
  * getInstance() reads custom metadata without spending a SOQL query and without
- * needing test setup data, which is why this replaced the SOQL read the original
- * version used.
+ * needing test setup data, which is why it is used here in preference to SOQL.
  */
 public with sharing class EmployeeContactSettings {
     @TestVisible
