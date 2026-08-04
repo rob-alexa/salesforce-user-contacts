@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # Formatting and static analysis. Needs no org and no secrets, so it runs on every
+  # push and pull request including from forks.
+  static-analysis:
+    name: Format + Code Analyzer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+
+      - name: Setup Java (PMD and CPD engines)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check formatting
+        run: npm run prettier:verify
+
+      - name: Install Salesforce CLI and Code Analyzer
+        run: |
+          npm install --global @salesforce/cli
+          sf plugins install code-analyzer
+
+      - name: Run Code Analyzer
+        run: |
+          sf code-analyzer run \
+            --rule-selector Recommended \
+            --workspace force-app \
+            --severity-threshold 3 \
+            --view table \
+            --output-file results.json \
+            --output-file results.html
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-analyzer-results
+          path: |
+            results.json
+            results.html
+          if-no-files-found: ignore
+
+  # Deploys into a throwaway scratch org and runs the Apex tests. This one does need
+  # an org, so it stays off until DEVHUB_AUTH_URL is set as a repository secret (a
+  # `sf org display --verbose` Sfdx Auth Url for a Dev Hub). Until then the job is
+  # skipped rather than silently passing.
+  scratch-org-tests:
+    name: Apex tests (scratch org)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check for a Dev Hub secret
+        id: gate
+        env:
+          DEVHUB_AUTH_URL: ${{ secrets.DEVHUB_AUTH_URL }}
+        run: |
+          if [ -z "$DEVHUB_AUTH_URL" ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::DEVHUB_AUTH_URL is not set, so the Apex tests did not run. Add the secret to enable this job."
+          else
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install Salesforce CLI
+        if: steps.gate.outputs.run == 'true'
+        run: npm install --global @salesforce/cli
+
+      - name: Authenticate the Dev Hub
+        if: steps.gate.outputs.run == 'true'
+        env:
+          DEVHUB_AUTH_URL: ${{ secrets.DEVHUB_AUTH_URL }}
+        run: |
+          printf '%s' "$DEVHUB_AUTH_URL" > devhub.txt
+          sf org login sfdx-url --sfdx-url-file devhub.txt --set-default-dev-hub --alias devhub
+          rm -f devhub.txt
+
+      - name: Create a scratch org
+        if: steps.gate.outputs.run == 'true'
+        run: sf org create scratch --definition-file config/project-scratch-def.json --alias ci --set-default --duration-days 1 --wait 20
+
+      - name: Deploy and run the tests
+        if: steps.gate.outputs.run == 'true'
+        run: sf project deploy start --test-level RunLocalTests --wait 30
+
+      - name: Delete the scratch org
+        if: always() && steps.gate.outputs.run == 'true'
+        run: sf org delete scratch --target-org ci --no-prompt

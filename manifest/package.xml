@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>*</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>*</members>
+        <name>ApexTrigger</name>
+    </types>
+    <types>
+        <members>Contact.Extension__c</members>
+        <members>Contact.No_Longer_There__c</members>
+        <members>Contact.Status__c</members>
+        <members>Contact.User__c</members>
+        <members>Employee_Contact_Setting__mdt.ID__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Employee_Contact_Setting__mdt</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Employee_Contact_Setting.Company_Account</members>
+        <name>CustomMetadata</name>
+    </types>
+    <version>67.0</version>
+</Package>

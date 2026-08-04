@@ -1,0 +1,8 @@
+# Store everything with LF so the repo reads the same on Windows, macOS, and the
+# Linux CI runner. Without this, a Windows checkout commits CRLF and every file
+# looks changed to the next person.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.gif binary

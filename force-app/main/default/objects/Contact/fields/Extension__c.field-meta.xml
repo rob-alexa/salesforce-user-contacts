@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Extension__c</fullName>
+    <description>Phone extension copied from the related user record. Contact has no standard extension field, so the sync needs this one.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Set automatically from the related user record.</inlineHelpText>
+    <label>Extension</label>
+    <length>40</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

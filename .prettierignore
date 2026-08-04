@@ -1,0 +1,6 @@
+.sf
+.sfdx
+node_modules
+results.json
+results.html
+results.sarif
